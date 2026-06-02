@@ -12,3 +12,16 @@ CacheRedis:
   - Host: redis:16379
     Type: node # 单节点模式
     Pass:
+
+Prometheus:
+  Host: 0.0.0.0
+  Port: 9091
+  Path: /metrics
+
+
+
+Telemetry:
+  Name: product.rpc
+  Endpoint: http://jaeger:14268/api/traces
+  Sampler: 1.0
+  Batcher: jaeger

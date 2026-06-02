@@ -24,3 +24,15 @@ PayRpc:
     Hosts:
       - 127.0.0.1:12379
     Key: pay.rpc
+
+Prometheus:
+  Host: 0.0.0.0
+  Port: 9083
+  Path: /metrics
+
+
+Telemetry:
+  Name: pay.api
+  Endpoint: http://jaeger:14268/api/traces
+  Sampler: 1.0
+  Batcher: jaeger
