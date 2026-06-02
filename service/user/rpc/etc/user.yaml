@@ -1,0 +1,15 @@
+Name: user.rpc
+ListenOn: 0.0.0.0:9000
+Etcd:
+  Hosts:
+    - 127.0.0.1:12379
+  Key: user.rpc
+Mysql:
+  DataSource: root:123456@tcp(127.0.0.1:3307)/juejinmall?charset=utf8mb4&parseTime=true&loc=Local
+
+CacheRedis:
+  - Host: 127.0.0.1:16379
+    Type: node # 单节点模式
+    Pass:
+
+Salt: HWVOFkGgPTryzICwd7qnJaZR9KQ2i8xe

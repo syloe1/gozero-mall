@@ -1,0 +1,50 @@
+type (
+	// 登录请求参数
+	LoginRequest {
+		Mobile   string `json:"mobile"` // 手机号
+		Password string `json:"password"` // 密码
+	}
+	// 登录返回结果
+	LoginResponse {
+		AccessToken  string `json:"accessToken"` // JWT 令牌
+		AccessExpire int64  `json:"accessExpire"` // 令牌过期时间戳
+	}
+	// 注册请求参数
+	RegisterRequest {
+		Name     string `json:"name"` // 用户名
+		Gender   int64  `json:"gender"` // 性别（对应数据库 tinyint）
+		Mobile   string `json:"mobile"` // 手机号
+		Password string `json:"password"` // 密码
+	}
+	// 注册返回结果
+	RegisterResponse {
+		Id     int64  `json:"id"` // 用户ID
+		Name   string `json:"name"` // 姓名
+		Gender int64  `json:"gender"` // 性别
+		Mobile string `json:"mobile"` // 手机号
+	}
+	// 获取用户信息返回结果
+	UserInfoResponse {
+		Id     int64  `json:"id"`
+		Name   string `json:"name"`
+		Gender int64  `json:"gender"`
+		Mobile string `json:"mobile"`
+	}
+)
+
+service User {
+	@handler Login
+	post /api/user/login (LoginRequest) returns (LoginResponse)
+
+	@handler Register
+	post /api/user/register (RegisterRequest) returns (RegisterResponse)
+}
+
+@server (
+	jwt: Auth
+)
+service User {
+	@handler UserInfo
+	post /api/user/userinfo returns (UserInfoResponse)
+}
+

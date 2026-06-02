@@ -1,0 +1,23 @@
+Name: Product
+Host: 0.0.0.0
+Port: 8001
+
+
+Mysql:
+  DataSource: root:123456@tcp(127.0.0.1:3307)/iot?charset=utf8mb4&parseTime=true&loc=Local
+
+CacheRedis:
+  - Host: redis:16379
+    Type: node # 单节点模式
+    Pass:
+
+Auth:
+  AccessSecret: uOvKLmVfztaXGpNYd4Z0I1SiT7MweJhl
+  AccessExpire: 86400 # 1天
+
+
+ProductRpc:
+  Etcd:
+    Hosts:
+      - localhost:12379
+    Key: product.rpc
