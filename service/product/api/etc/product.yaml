@@ -4,10 +4,10 @@ Port: 8001
 
 
 Mysql:
-  DataSource: root:123456@tcp(127.0.0.1:3307)/iot?charset=utf8mb4&parseTime=true&loc=Local
+  DataSource: root:123456@tcp(127.0.0.1:3307)/mall?charset=utf8mb4&parseTime=true&loc=Local
 
 CacheRedis:
-  - Host: redis:16379
+  - Host: 127.0.0.1:16379
     Type: node # 单节点模式
     Pass:
 
@@ -29,6 +29,6 @@ Prometheus:
 
 Telemetry:
   Name: product.api
-  Endpoint: http://jaeger:14268/api/traces
+  Endpoint: 127.0.0.1:14268
   Sampler: 1.0
-  Batcher: jaeger
+  Batcher: otlphttp

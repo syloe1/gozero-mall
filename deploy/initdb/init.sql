@@ -1,0 +1,58 @@
+CREATE DATABASE IF NOT EXISTS `mall` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+USE `mall`;
+
+-- 用户表
+CREATE TABLE IF NOT EXISTS `user` (
+    `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`        VARCHAR(255)    NOT NULL DEFAULT '' COMMENT '用户姓名',
+    `gender`      BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '用户性别',
+    `mobile`      VARCHAR(255)    NOT NULL DEFAULT '' COMMENT '用户电话',
+    `password`    VARCHAR(255)    NOT NULL DEFAULT '' COMMENT '用户密码',
+    `create_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_mobile` (`mobile`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 产品表
+CREATE TABLE IF NOT EXISTS `product` (
+    `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name`        VARCHAR(255)    NOT NULL DEFAULT '' COMMENT '产品名称',
+    `desc`        VARCHAR(255)    NOT NULL DEFAULT '' COMMENT '产品描述',
+    `stock`       BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '产品库存',
+    `amount`      BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '产品金额',
+    `status`      BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '产品状态',
+    `create_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 订单表
+CREATE TABLE IF NOT EXISTS `order` (
+    `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `uid`         BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '用户ID',
+    `pid`         BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '产品ID',
+    `amount`      BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '订单金额',
+    `status`      BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '订单状态',
+    `create_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_uid` (`uid`),
+    KEY `idx_pid` (`pid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 支付表
+CREATE TABLE IF NOT EXISTS `pay` (
+    `id`          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `uid`         BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '用户ID',
+    `oid`         BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '订单ID',
+    `amount`      BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '产品金额',
+    `source`      BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '支付方式',
+    `status`      BIGINT UNSIGNED NOT NULL DEFAULT 0  COMMENT '支付状态',
+    `create_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `update_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_uid` (`uid`),
+    KEY `idx_oid` (`oid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

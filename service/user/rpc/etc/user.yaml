@@ -5,7 +5,7 @@ Etcd:
     - 127.0.0.1:12379
   Key: user.rpc
 Mysql:
-  DataSource: root:123456@tcp(127.0.0.1:3307)/juejinmall?charset=utf8mb4&parseTime=true&loc=Local
+  DataSource: root:123456@tcp(127.0.0.1:3307)/mall?charset=utf8mb4&parseTime=true&loc=Local
 
 CacheRedis:
   - Host: 127.0.0.1:16379
@@ -14,8 +14,8 @@ CacheRedis:
 
 Salt: HWVOFkGgPTryzICwd7qnJaZR9KQ2i8xe
 
-uth: true               # 是否开启 Auth 验证
-StrictControl: true      # 是否开启严格模式
+Auth: false              # 是否开启 Auth 验证
+StrictControl: false      # 是否开启严格模式
 Redis:                   # 指定 Redis 服务
   Key: rpc:auth:user     # 指定 Key 应为 hash 类型
   Host: 127.0.0.1:16379
@@ -30,6 +30,6 @@ Prometheus:
 
 Telemetry:
   Name: user.rpc
-  Endpoint: http://jaeger:14268/api/traces
+  Endpoint: 127.0.0.1:14268
   Sampler: 1.0
-  Batcher: jaeger
+  Batcher: otlphttp
