@@ -1,8 +1,13 @@
 name: zero-mall
 
-# 所有 Go 服务共用一个镜像，启动哪个服务由各自 command 决定
+# 所有 Go 服务共用一个镜像，启动哪个服务由各自 command 决定。
+# 每个服务都声明 build：这样镜像不存在时 compose 会本地构建，
+# 而不是去 Docker Hub 拉一个不存在的 zero-mall-backend。
 x-backend: &backend
   image: zero-mall-backend:latest
+  build:
+    context: .
+    dockerfile: Dockerfile
   restart: unless-stopped
   networks:
     - mall-net
@@ -88,9 +93,6 @@ services:
   # ---------------- rpc ----------------
   user-rpc:
     <<: *backend
-    build:
-      context: .
-      dockerfile: Dockerfile
     command: ["/app/user-rpc", "-f", "/app/etc/user-rpc.yaml"]
     depends_on:
       mysql: { condition: service_healthy }
