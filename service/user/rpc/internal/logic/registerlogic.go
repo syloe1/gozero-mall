@@ -44,14 +44,15 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 		if err != nil {
 			return nil, status.Error(500, err.Error())
 		}
-		newUser.Id, err = res.LastInsertId()
+		id, err := res.LastInsertId()
 		if err != nil {
 			return nil, status.Error(500, err.Error())
 		}
+		newUser.Id = uint64(id)
 		return &user.RegisterResponse{
-			Id:     newUser.Id,
+			Id:     int64(newUser.Id),
 			Name:   newUser.Name,
-			Gender: newUser.Gender,
+			Gender: int64(newUser.Gender),
 			Mobile: newUser.Mobile,
 		}, nil
 	}

@@ -41,9 +41,9 @@ func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
 	}
 
 	return &user.LoginResponse{
-		Id:     res.Id,
+		Id:     int64(res.Id),
 		Name:   res.Name,
-		Gender: res.Gender,
+		Gender: int64(res.Gender),
 		Mobile: res.Mobile,
 	}, nil
 }
