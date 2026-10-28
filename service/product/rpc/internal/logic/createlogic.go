@@ -29,21 +29,22 @@ func (l *CreateLogic) Create(in *product.CreateRequest) (*product.CreateResponse
 	newProduct := model.Product{
 		Name:   in.Name,
 		Desc:   in.Desc,
-		Stock:  uint64(in.Stock),
-		Amount: uint64(in.Amount),
-		Status: uint64(in.Status),
+		Stock:  in.Stock,
+		Amount: in.Amount,
+		Status: in.Status,
 	}
 	// dial 底层DB去做
 	res, err := l.svcCtx.ProductModel.Insert(l.ctx, &newProduct)
 	if err != nil {
 		return nil, status.Error(500, err.Error())
 	}
-	newProduct.Id, err = res.LastInsertId()
+	lastId, err := res.LastInsertId()
 	if err != nil {
 		return nil, status.Error(500, err.Error())
 	}
+	newProduct.Id = lastId
 
 	return &product.CreateResponse{
-		Id: int64(newProduct.Id),
+		Id: newProduct.Id,
 	}, nil
 }

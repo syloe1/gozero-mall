@@ -1,0 +1,168 @@
+name: zero-mall
+
+# 所有 Go 服务共用一个镜像，启动哪个服务由各自 command 决定
+x-backend: &backend
+  image: zero-mall-backend:latest
+  restart: unless-stopped
+  networks:
+    - mall-net
+  volumes:
+    - ./deploy/etc:/app/etc:ro
+
+services:
+  # ---------------- infra ----------------
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.17
+    restart: unless-stopped
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd
+      - --data-dir=/etcd-data
+      - --advertise-client-urls=http://etcd:2379
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-advertise-peer-urls=http://etcd:2380
+      - --initial-cluster=etcd=http://etcd:2380
+      - --initial-cluster-state=new
+    volumes:
+      - etcd-data:/etcd-data
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - mall-net
+
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: mall
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./deploy/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - mall-net
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mall-net
+
+  # user.rpc 开启了 RPC 鉴权：go-zero 不会自动生成 token，
+  # 必须把 app/token 预置进 Redis（见 deploy/etc/user-api.yaml 里的 App/Token）
+  redis-init:
+    image: redis:7-alpine
+    depends_on:
+      redis:
+        condition: service_healthy
+    command:
+      - sh
+      - -c
+      - redis-cli -h redis HSET rpc:auth:user userapi 6jKNZbEpYGeUMAifz10gOnmoty3TV
+    restart: "no"
+    networks:
+      - mall-net
+
+  # ---------------- rpc ----------------
+  user-rpc:
+    <<: *backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["/app/user-rpc", "-f", "/app/etc/user-rpc.yaml"]
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      etcd: { condition: service_healthy }
+
+  product-rpc:
+    <<: *backend
+    command: ["/app/product-rpc", "-f", "/app/etc/product-rpc.yaml"]
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      etcd: { condition: service_healthy }
+
+  order-rpc:
+    <<: *backend
+    command: ["/app/order-rpc", "-f", "/app/etc/order-rpc.yaml"]
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      etcd: { condition: service_healthy }
+      user-rpc: { condition: service_started }
+      product-rpc: { condition: service_started }
+
+  pay-rpc:
+    <<: *backend
+    command: ["/app/pay-rpc", "-f", "/app/etc/pay-rpc.yaml"]
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      etcd: { condition: service_healthy }
+      user-rpc: { condition: service_started }
+      order-rpc: { condition: service_started }
+
+  # ---------------- api ----------------
+  user-api:
+    <<: *backend
+    command: ["/app/user-api", "-f", "/app/etc/user-api.yaml"]
+    ports:
+      - "8000:8000"
+    depends_on:
+      user-rpc: { condition: service_started }
+
+  product-api:
+    <<: *backend
+    command: ["/app/product-api", "-f", "/app/etc/product-api.yaml"]
+    ports:
+      - "8001:8001"
+    depends_on:
+      product-rpc: { condition: service_started }
+
+  order-api:
+    <<: *backend
+    command: ["/app/order-api", "-f", "/app/etc/order-api.yaml"]
+    ports:
+      - "8888:8888"
+    depends_on:
+      order-rpc: { condition: service_started }
+
+  pay-api:
+    <<: *backend
+    command: ["/app/pay-api", "-f", "/app/etc/pay-api.yaml"]
+    ports:
+      - "8003:8003"
+    depends_on:
+      pay-rpc: { condition: service_started }
+
+volumes:
+  mysql-data:
+  redis-data:
+  etcd-data:
+
+networks:
+  mall-net:
+    driver: bridge

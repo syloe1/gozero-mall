@@ -30,9 +30,9 @@ var (
 type (
 	productModel interface {
 		Insert(ctx context.Context, data *Product) (sql.Result, error)
-		FindOne(ctx context.Context, id uint64) (*Product, error)
+		FindOne(ctx context.Context, id int64) (*Product, error)
 		Update(ctx context.Context, data *Product) error
-		Delete(ctx context.Context, id uint64) error
+		Delete(ctx context.Context, id int64) error
 	}
 
 	defaultProductModel struct {
@@ -41,12 +41,12 @@ type (
 	}
 
 	Product struct {
-		Id         uint64    `db:"id"`
+		Id         int64    `db:"id"`
 		Name       string    `db:"name"`   // 产品名称
 		Desc       string    `db:"desc"`   // 产品描述
-		Stock      uint64    `db:"stock"`  // 产品库存
-		Amount     uint64    `db:"amount"` // 产品金额
-		Status     uint64    `db:"status"` // 产品状态
+		Stock      int64    `db:"stock"`  // 产品库存
+		Amount     int64    `db:"amount"` // 产品金额
+		Status     int64    `db:"status"` // 产品状态
 		CreateTime time.Time `db:"create_time"`
 		UpdateTime time.Time `db:"update_time"`
 	}
@@ -59,7 +59,7 @@ func newProductModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.Option)
 	}
 }
 
-func (m *defaultProductModel) Delete(ctx context.Context, id uint64) error {
+func (m *defaultProductModel) Delete(ctx context.Context, id int64) error {
 	productIdKey := fmt.Sprintf("%s%v", cacheProductIdPrefix, id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
@@ -68,7 +68,7 @@ func (m *defaultProductModel) Delete(ctx context.Context, id uint64) error {
 	return err
 }
 
-func (m *defaultProductModel) FindOne(ctx context.Context, id uint64) (*Product, error) {
+func (m *defaultProductModel) FindOne(ctx context.Context, id int64) (*Product, error) {
 	productIdKey := fmt.Sprintf("%s%v", cacheProductIdPrefix, id)
 	var resp Product
 	err := m.QueryRowCtx(ctx, &resp, productIdKey, func(ctx context.Context, conn sqlx.SqlConn, v any) error {

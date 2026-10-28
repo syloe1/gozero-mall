@@ -15,7 +15,9 @@ Auth:
   AccessExpire: 86400
 
 UserRpc:
+  App: userapi # App 标识
+  Token: 6jKNZbEpYGeUMAifz10gOnmoty3TV # Token 值
   Etcd:
     Hosts:
-      - 127.0.0.1:12379
+      - etcd:2379
     Key: user.rpc

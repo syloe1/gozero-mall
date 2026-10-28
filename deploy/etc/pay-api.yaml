@@ -1,0 +1,13 @@
+Name: pay.api
+Host: 0.0.0.0
+Port: 8003
+
+Auth:
+  AccessSecret: uOvKLmVfztaXGpNYd4Z0I1SiT7MweJhl
+  AccessExpire: 86400
+
+PayRpc:
+  Etcd:
+    Hosts:
+      - etcd:2379
+    Key: pay.rpc
