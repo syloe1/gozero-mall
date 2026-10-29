@@ -1,6 +1,6 @@
 Name: Order
 Host: 0.0.0.0
-Port: 8888
+Port: 8002
 
 Mysql:
   DataSource: root:123456@tcp(mysql:3306)/mall?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
@@ -19,3 +19,7 @@ OrderRpc:
     Hosts:
       - etcd:2379
     Key: order.rpc
+Prometheus:
+  Host: 0.0.0.0
+  Port: 9082
+  Path: /metrics

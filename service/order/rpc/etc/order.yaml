@@ -1,5 +1,5 @@
 Name: order.rpc
-ListenOn: 0.0.0.0:8080
+ListenOn: 0.0.0.0:9002
 Etcd:
   Hosts:
   - 127.0.0.1:2379
@@ -31,3 +31,8 @@ ProductRpc:
     Hosts:
     - etcd:2379
     Key: product.rpc
+
+Prometheus:
+  Host: 0.0.0.0
+  Port: 9092
+  Path: /metrics
